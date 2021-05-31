@@ -4,14 +4,17 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import firstViewImage from '../../assets/firstview-img.png'
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
-
-export default function FirstView() {
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+export default function FirstView({ navigation }) {
 
     // this const will return boolean value 
     const [loaded] = useFonts({
         Nunito: require('../../assets/fonts/Nunito-Bold.ttf'),
       });
-
+      if (!loaded) {
+        return null;
+      }
     return (
         <View style={styles.container}>
             <View style={styles.imageContainer}>
@@ -24,10 +27,10 @@ export default function FirstView() {
             <View style={styles.detailsContainer}>
                 <Text style={styles.heading}>Connect Together</Text>
                 <Text style={styles.para}>Find your best friend with us</Text>
-                <TouchableOpacity style={styles.btn} onPress={()=>{console.log("get started pressed!")}}>
+                <TouchableOpacity style={styles.btn} onPress={()=>{navigation.navigate('signupview')}}>
                     <Text style={{color:'#fff',fontSize:18, textAlign:'center'}}>Get Started</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{marginTop:20}}  onPress={()=>{console.log("get started pressed!")}} >
+                <TouchableOpacity style={{marginTop:20}}  onPress={()=>{navigation.navigate('loginview')}} >
                     <Text style={{  fontFamily: 'Nunito', color:'#35354c',fontSize:20, textAlign:'center'}}>Log in</Text>
                 </TouchableOpacity>
             </View>
