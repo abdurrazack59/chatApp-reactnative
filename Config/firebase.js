@@ -31,7 +31,7 @@ const registerUser = (email, password, fullName) => {
         fullName,
         userID
       })
-      .then((docRef) => {
+        .then((docRef) => {
           console.log("Document written with ID: ", docRef.id);
           Alert.alert(
             "SUCCESS",
@@ -65,7 +65,7 @@ const registerUser = (email, password, fullName) => {
             { cancelable: false }
           );
         });
-       })
+    })
     .catch((error) => {
       var errorMessage = error.message;
       Alert.alert(
@@ -88,45 +88,70 @@ const registerUser = (email, password, fullName) => {
 const signInUser = (email, password) => {
   console.log('Signin user')
   // calling firebase method for signing in user
-  firebase.auth().signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      // Signed in
-      var user = userCredential.user;
-      console.log(`user login ${user}`)
-
-    })
-    .catch((error) => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      Alert.alert(
-        "ERROR",
-        errorMessage,
-        [
-          {
-            text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel"
-          },
-          { text: "OK", onPress: () => console.log("OK Pressed") }
-        ],
-        { cancelable: false }
-      );
-    });
+  return firebase.auth().signInWithEmailAndPassword(email, password)
+    
 }
 
 // function for saving user's message
-const saveUserMessage = (userMsg) =>{
-  console.log(`firebase save user's message run ${userMsg}`)
+const saveUserMessage = (userMsg, userID) => {
+
   db.collection('allUsersMessage').add({
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    userMsg
+    userMsg,
+    userID
   })
-  .then(res=>{console.log(`user msg sent!`)})
-  .catch(error=>{console.log(`error => ${error}`)})
+    .then(res => { console.log(`user msg sent!`) })
+    .catch(error => { console.log(`error => ${error}`) })
 }
+
+// function for signing out 
+const signOutUser = () => {
+  // calling sign out firebase method 
+  return  auth.signOut()
+  
+}
+
+// function for calling all users data 
+const getAllUsersData = () =>{
+  return new Promise((resolve,reject)=>{
+    db.collection('allUsers').get()
+    .then(snapshot=>{
+      var arr = [];
+      snapshot.forEach(doc=>{
+      
+        arr.push({...doc.data()})
+        resolve(arr)
+       
+      })
+    })
+    .catch(error=>{
+      reject(error)
+    })
+  })
+}
+
+
+// function for calling all users message 
+const getAllMsgs = () =>{
+  return new Promise((resolve,reject)=>{
+    db.collection("allUsersMessage") 
+    .onSnapshot((snapshot) => {
+      var arr = [];
+      snapshot.forEach(doc=>{
+        arr.push({...doc.data()})
+        resolve(arr)
+        
+      })
+    });
+  })
+}
+
 export {
   registerUser,
   signInUser,
   auth,
-  saveUserMessage
+  saveUserMessage,
+  signOutUser,
+  getAllUsersData,
+  getAllMsgs
 }

@@ -4,9 +4,9 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView 
 import signupImage from '../../assets/signup-img.png'
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
-import { registerUser } from '../../Config/firebase'
+import { signOutUser } from '../../Config/firebase'
 
-export default function SignupView({ navigation }) {
+export default function ProfileView({ navigation }) {
 
     // this const will return boolean value 
     const [loaded] = useFonts({
@@ -18,19 +18,16 @@ export default function SignupView({ navigation }) {
     const [userFullName, setUserFullName] = useState('')
     const [userPassword, setUserPassword] = useState('')
 
-    // loading for btn 
-    const [isBtnLoad, setIsBtnLoad] = useState(false)
-
     // registering user 
-    const signingUp = () => {
-        console.log(`
-        user email : ${userEmail}
-        user full name : ${userFullName}
-        user password : ${userPassword}
-        `)
-        registerUser(userEmail, userPassword, userFullName)
+    const signingOut = () => {
+        signOutUser()
+            .then(res => {
+                console.log("user sign out!")
+
+            })
+            .catch(error => { console.log(error) })
     }
-    
+
     return (
         <View style={styles.container}>
             <View style={styles.imageContainer}>
@@ -39,25 +36,21 @@ export default function SignupView({ navigation }) {
                     source={signupImage}
                 />
             </View>
-            <ScrollView style={{width:'100%'}}>
-            <View style={styles.detailsContainer}>
-                <Text style={styles.heading}>Sign up</Text>
-                <Text style={styles.para}>Sign up and get started</Text>
-                <TextInput style={styles.input} placeholder="Email" placeholderTextColor="gray" onChangeText={text => setUserEmail(text)} />
-                <TextInput style={styles.input} placeholder="Your Full Name" placeholderTextColor="gray" onChangeText={text => setUserFullName(text)} />
-                <TextInput style={styles.input} secureTextEntry={true} placeholder="Password" placeholderTextColor="gray" onChangeText={text => setUserPassword(text)} />
-                {isBtnLoad ? <Text style={{ color: '#35354c', fontSize: 20, textAlign: 'center' }}>Loading...</Text> : 
-                <TouchableOpacity
-                    style={styles.btn}
-                    onPress={() => { signingUp() }}>
-                    <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>Sign up</Text>
-                </TouchableOpacity>}
-                <TouchableOpacity style={{ marginTop: 20 }} onPress={() => { navigation.navigate('loginview') }} >
-                    <Text style={{ color: '#35354c', fontSize: 20, textAlign: 'center' }}>Log in</Text>
-                </TouchableOpacity>
-            </View>
+            <ScrollView style={{ width: '100%' }}>
+                <View style={styles.detailsContainer}>
+                    <Text style={styles.heading}>Muhammad Azhar Iqbal</Text>
+                    <Text style={styles.para}>muhammad1azhar2@gmail.com</Text>
+
+
+                    <TouchableOpacity
+                        style={styles.btn}
+                        onPress={() => { signingOut() }}>
+                        <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>Log out</Text>
+                    </TouchableOpacity>
+
+                </View>
             </ScrollView>
-           
+
 
             <StatusBar style="auto" />
         </View>
@@ -72,26 +65,28 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     imageContainer: {
-        flex: 4,
+        flex: 1,
         width: '100%',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+
     },
     image: {
         height: "80%",
         width: '80%',
         margin: 'auto'
+
     },
     detailsContainer: {
-        flex: 6,
+        flex: 8,
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center'
     },
     heading: {
         fontFamily: 'Nunito',
-         fontSize: 35, 
-         color: '#35354c',
+        fontSize: 35,
+        color: '#35354c',
     },
     para: {
         fontFamily: 'Nunito',

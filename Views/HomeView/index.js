@@ -1,85 +1,111 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
-import {saveUserMessage} from '../../Config/firebase'
+import { faPaperPlane, faUserAlt, } from '@fortawesome/free-solid-svg-icons'
+import { saveUserMessage, getAllUsersData, getAllMsgs } from '../../Config/firebase'
+import { auth } from '../../Config/firebase'
+
 export default function HomeView({ navigation }) {
-    console.log(navigation)
     // this const will return boolean value 
     const [loaded] = useFonts({
         Nunito: require('../../assets/fonts/Nunito-Bold.ttf'),
     });
-   
+
+    const [allUsersMsg, setAllUsersMsg] = useState([])
+    const [currentUserDetails, setCurrentUserDetails] = useState('')
+    const [allUsers, setAllUsers] = useState([])
+
+    useEffect(() => {
+
+        auth.onAuthStateChanged(user => { user ? setCurrentUserDetails(user) : setCurrentUserDetails(false) })
+
+        getAllUsersData()
+            .then(res => { setAllUsers(res) })
+            .catch(error => { console.log(`Error in getting all users data ==> ${error}`) })
+
+        getAllMsgs()
+            .then(res => { setAllUsersMsg(res) })
+            .catch(error => { console.log(`error in in getting all users msgs ==> ${error}`) })
+    }, [allUsersMsg])
+
     // getting user input message on change text 
     const [userInputMessage, setUserInputMessage] = useState('')
-   
+
     // saving user message 
-    const saveUserMessage = () =>{
+    const savingUserMessage = () => {
         console.log(`user said : ${userInputMessage}`)
-        saveUserMessage(userInputMessage)
+        saveUserMessage(userInputMessage, currentUserDetails.uid)
+        setUserInputMessage('')
     }
+
     return (
-        
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.heading}>Chat With Friends</Text>
+                <View style={{ flexDirection: 'row' }}>
+                    <Text style={styles.heading}>Chat With Friends </Text>
+                    <TouchableOpacity onPress={() => { navigation.navigate('profileview') }}>
+                        <FontAwesomeIcon icon={faUserAlt} size={25} style={{ color: '#fff', margin: 10 }} />
+                    </TouchableOpacity>
+                </View>
                 <ScrollView
                     horizontal={true} showsHorizontalScrollIndicator={false}
                     pagingEnabled={true}>
-                    <View style={styles.box}></View>
-                    <View style={styles.box}></View>
-                    <View style={styles.box}></View>
-                    <View style={styles.box}></View>
-                    <View style={styles.box}></View>
-                    <View style={styles.box}></View>
-                    <View style={styles.box}></View>
-
+                    {allUsers.map((users) => {
+                        return (
+                            <View style={styles.box}>
+                                <Text style={styles.para}>{users.fullName.charAt(0)}</Text>
+                            </View>
+                        )
+                    })}
                 </ScrollView>
                 <Text style={styles.para}> . All Messages</Text>
             </View>
             <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
                 <View style={styles.allMsgsContainer}>
+                    {allUsersMsg.map(msgs => {
+                        console.log(`login user id ${currentUserDetails.uid}`)
+                        console.log(msgs)
+                        if (currentUserDetails.uid === msgs.userID) {
+                            return (
+                                <View style={styles.mineMsg}>
+                                    <Text style={styles.para}>{msgs.userMsg}</Text>
+                                </View>)
+                        }
+                        else {
+                            return (
+                                <View style={styles.msgContainer}>
+                                    <View style={styles.avatar}>
+                                        {allUsers.map(users => {
+                                            if (users.userID === msgs.userID) {
+                                                return (<Text style={styles.para}>{users.fullName.charAt(0)}</Text>)
+                                            }
+                                        })}
+                                    </View>
 
-                    <View style={styles.msgContainer}>
-                        <View style={styles.avatar}>
-                            <Text style={styles.para}>AI</Text>
-                        </View>
+                                    <View style={styles.userMsg}>
 
-                        <View style={styles.userMsg}>
+                                        <Text style={styles.para}>{msgs.userMsg}</Text>
 
-                            <Text style={styles.para}>hello, this is azhar here!</Text>
-                            <Text style={styles.para}>3 : 00 PM</Text>
-                        </View>
-                    </View>
-
-
-                    <View style={styles.mineMsg}>
-                        <Text style={styles.para}>hello, this is azhar here!</Text>
-                        <Text style={styles.para}>3 : 00 PM</Text>
-                    </View>
-
-
-
-
-
+                                    </View>
+                                </View>)
+                        }
+                    })}
                 </View>
-
-
             </ScrollView>
             <View style={styles.footer}>
-                <TextInput 
-                style={styles.input} 
-                placeholder='Type your message' 
-                placeholderTextColor="#8a8b9e"
-                onChangeText={(text)=>{setUserInputMessage(text)}}
+                <TextInput
+                    style={styles.input}
+                    value={userInputMessage}
+                    placeholder='Type your message'
+                    placeholderTextColor="#8a8b9e"
+                    onChangeText={(text) => { setUserInputMessage(text) }}
                 ></TextInput>
-                <TouchableOpacity onPress={()=>{ saveUserMessage()}}>
+                <TouchableOpacity onPress={() => { savingUserMessage() }}>
                     <FontAwesomeIcon icon={faPaperPlane} size={25} />
                 </TouchableOpacity>
-
             </View>
 
         </View>
@@ -100,8 +126,6 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         justifyContent: 'center',
         padding: 10
-
-
     },
     scroll: {
         width: '100%',
@@ -111,15 +135,11 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 30,
     },
     allMsgsContainer: {
-
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center'
-
-
     },
     msgContainer: {
-
         width: '100%',
         flexDirection: 'row'
     },
@@ -142,8 +162,6 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 25,
         margin: 5,
         padding: 10
-
-
     },
 
     mineMsg: {
@@ -155,14 +173,11 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 25,
         margin: 5,
         padding: 10
-
     },
     heading: {
         fontFamily: 'Nunito',
         fontSize: 35,
         color: '#fff',
-
-
     },
     para: {
         fontFamily: 'Nunito',
@@ -174,7 +189,9 @@ const styles = StyleSheet.create({
         width: 80,
         backgroundColor: '#fff',
         borderRadius: 50,
-        margin: 10
+        margin: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     input: {
 
@@ -182,7 +199,6 @@ const styles = StyleSheet.create({
         padding: 10,
         // backgroundColor:"#e3e2e7",
         borderRadius: 20,
-
         fontFamily: 'Nunito',
         width: "90%",
 
