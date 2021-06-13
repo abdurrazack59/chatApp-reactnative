@@ -5,7 +5,7 @@ import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPaperPlane, faUserAlt, } from '@fortawesome/free-solid-svg-icons'
-import { saveUserMessage, getAllUsersData, getAllMsgs } from '../../Config/firebase'
+import { saveUserMessage, getAllUsersData, getAllMsgs, db } from '../../Config/firebase'
 import { auth } from '../../Config/firebase'
 
 export default function HomeView({ navigation }) {
@@ -22,6 +22,9 @@ export default function HomeView({ navigation }) {
 
     useEffect(() => {
         auth.onAuthStateChanged(user => { user ? setCurrentUserDetails(user) : setCurrentUserDetails(false) })
+        db.collection('allUsersMessage').orderBy('timestamp', 'asc').onSnapshot(snapshot=>{
+            setAllUsersMsg(snapshot.docs.map(doc=> doc.data() ))
+        })
         getAllUsersData()
             .then(res => { setAllUsers(res) })
             .catch(error => {
@@ -38,26 +41,33 @@ export default function HomeView({ navigation }) {
                     { cancelable: false }
                 );
             })
+            
+           
+               
+               
+                
 
-        getAllMsgs()
-            .then(res => { setAllUsersMsg(res) })
-            .catch(error => {
-                Alert.alert(
-                    "ERROR",
-                    error.message,
-                    [
-                        {
-                            text: "Cancel",
-                            style: "cancel"
-                        },
-                        { text: "OK" }
-                    ],
-                    { cancelable: false }
-                );
-            })
+            
+
+        // getAllMsgs()
+        //     .then(res => { setAllUsersMsg(res) })
+        //     .catch(error => {
+        //         Alert.alert(
+        //             "ERROR",
+        //             error.message,
+        //             [
+        //                 {
+        //                     text: "Cancel",
+        //                     style: "cancel"
+        //                 },
+        //                 { text: "OK" }
+        //             ],
+        //             { cancelable: false }
+        //         );
+        //     })
 
 
-    }, [forUpdating])
+    }, [])
 
     // getting user input message on change text 
     const [userInputMessage, setUserInputMessage] = useState('')

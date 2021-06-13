@@ -173,6 +173,7 @@ export {
   signOutUser,
   getAllUsersData,
   getAllMsgs,
-  getCurrentUserData
+  getCurrentUserData,
+  db
 
 }
