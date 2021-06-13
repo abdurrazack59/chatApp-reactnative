@@ -96,7 +96,7 @@ const signInUser = (email, password) => {
 const saveUserMessage = (userMsg, userID) => {
 
   db.collection('allUsersMessage').add({
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     userMsg,
     userID
   })
@@ -134,7 +134,7 @@ const getAllUsersData = () =>{
 // function for calling all users message 
 const getAllMsgs = () =>{
   return new Promise((resolve,reject)=>{
-    db.collection("allUsersMessage") 
+    db.collection("allUsersMessage").orderBy('timestamp', 'asc')
     .onSnapshot((snapshot) => {
       var arr = [];
       snapshot.forEach(doc=>{
@@ -153,5 +153,6 @@ export {
   saveUserMessage,
   signOutUser,
   getAllUsersData,
-  getAllMsgs
+  getAllMsgs,
+  db
 }

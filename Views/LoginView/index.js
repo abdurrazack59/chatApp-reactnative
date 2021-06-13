@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView,Alert } from 'react-native';
 import loginImage from '../../assets/login-img.png'
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
@@ -39,16 +39,18 @@ export default function LoginView({ navigation }) {
             .catch((error) => {
                 var errorCode = error.code;
                 var errorMessage = error.message;
+                setIsBtnLoad(false)
                 Alert.alert(
                     "ERROR",
                     errorMessage,
                     [
                         {
                             text: "Cancel",
-                            onPress: () => console.log("Cancel Pressed"),
+                            onPress: () => setIsBtnLoad(false)
+                            ,
                             style: "cancel"
                         },
-                        { text: "OK", onPress: () => console.log("OK Pressed") }
+                        { text: "OK", onPress: () => setIsBtnLoad(false) }
                     ],
                     { cancelable: false }
                 );

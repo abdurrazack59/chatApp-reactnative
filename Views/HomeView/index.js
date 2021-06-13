@@ -1,14 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPaperPlane, faUserAlt, } from '@fortawesome/free-solid-svg-icons'
-import { saveUserMessage, getAllUsersData, getAllMsgs } from '../../Config/firebase'
+import { saveUserMessage, getAllUsersData, getAllMsgs, db } from '../../Config/firebase'
 import { auth } from '../../Config/firebase'
 
 export default function HomeView({ navigation }) {
+
     // this const will return boolean value 
     const [loaded] = useFonts({
         Nunito: require('../../assets/fonts/Nunito-Bold.ttf'),
@@ -17,9 +18,9 @@ export default function HomeView({ navigation }) {
     const [allUsersMsg, setAllUsersMsg] = useState([])
     const [currentUserDetails, setCurrentUserDetails] = useState('')
     const [allUsers, setAllUsers] = useState([])
+    const [forUpdating, setForUpdating] = useState('')
 
     useEffect(() => {
-
         auth.onAuthStateChanged(user => { user ? setCurrentUserDetails(user) : setCurrentUserDetails(false) })
 
         getAllUsersData()
@@ -29,7 +30,9 @@ export default function HomeView({ navigation }) {
         getAllMsgs()
             .then(res => { setAllUsersMsg(res) })
             .catch(error => { console.log(`error in in getting all users msgs ==> ${error}`) })
-    }, [allUsersMsg])
+
+
+    }, [forUpdating])
 
     // getting user input message on change text 
     const [userInputMessage, setUserInputMessage] = useState('')
@@ -57,13 +60,12 @@ export default function HomeView({ navigation }) {
                         return (
                             <View style={styles.box}>
                                 <Text style={styles.para}>{users.fullName.charAt(0)}</Text>
-                            </View>
-                        )
+                            </View>)
                     })}
                 </ScrollView>
                 <Text style={styles.para}> . All Messages</Text>
             </View>
-            <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.scroll}>
                 <View style={styles.allMsgsContainer}>
                     {allUsersMsg.map(msgs => {
                         console.log(`login user id ${currentUserDetails.uid}`)
@@ -84,11 +86,8 @@ export default function HomeView({ navigation }) {
                                             }
                                         })}
                                     </View>
-
                                     <View style={styles.userMsg}>
-
                                         <Text style={styles.para}>{msgs.userMsg}</Text>
-
                                     </View>
                                 </View>)
                         }
@@ -103,7 +102,10 @@ export default function HomeView({ navigation }) {
                     placeholderTextColor="#8a8b9e"
                     onChangeText={(text) => { setUserInputMessage(text) }}
                 ></TextInput>
-                <TouchableOpacity onPress={() => { savingUserMessage() }}>
+                <TouchableOpacity onPress={() => {
+                    savingUserMessage()
+                    setForUpdating('update')
+                }}>
                     <FontAwesomeIcon icon={faPaperPlane} size={25} />
                 </TouchableOpacity>
             </View>
