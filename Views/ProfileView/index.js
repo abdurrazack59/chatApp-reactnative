@@ -1,24 +1,39 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import signupImage from '../../assets/signup-img.png'
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
-import { signOutUser } from '../../Config/firebase'
+import { signOutUser, getAllUsersData } from '../../Config/firebase'
 
-export default function ProfileView({ navigation }) {
+
+export default function ProfileView({ navigation, route }) {
+
+    const { userID } = route.params
+    const [currentUserDetails, setCurrentUserDetails] = useState([])
+    
+    useEffect(() => {
+        getAllUsersData()
+            .then(res => {
+                res.map(doc => {
+
+                    doc.userID === userID ? setCurrentUserDetails(doc) : null
+
+                })
+            })
+
+    }, [])
+
+
 
     // this const will return boolean value 
     const [loaded] = useFonts({
         Nunito: require('../../assets/fonts/Nunito-Bold.ttf'),
     });
 
-    // getting user details on change text 
-    const [userEmail, setUserEmail] = useState('')
-    const [userFullName, setUserFullName] = useState('')
-    const [userPassword, setUserPassword] = useState('')
 
-    // registering user 
+
+    // signing out user 
     const signingOut = () => {
         signOutUser()
             .then(res => {
@@ -27,19 +42,26 @@ export default function ProfileView({ navigation }) {
             })
             .catch(error => { console.log(error) })
     }
-
+    
     return (
         <View style={styles.container}>
             <View style={styles.imageContainer}>
-                <Image
-                    style={styles.image}
-                    source={signupImage}
-                />
+            <View style={styles.avatar}>
+            <Text style={{ fontFamily: 'Nunito', fontSize: 55, color: '#fff'}}>
+                { !currentUserDetails.fullName ? '---' :   currentUserDetails.fullName.charAt(0) }</Text>
+            </View>
             </View>
             <ScrollView style={{ width: '100%' }}>
                 <View style={styles.detailsContainer}>
-                    <Text style={styles.heading}>Muhammad Azhar Iqbal</Text>
-                    <Text style={styles.para}>muhammad1azhar2@gmail.com</Text>
+
+
+                    <Text style={styles.heading}>{currentUserDetails.fullName}</Text>
+                    <Text style={styles.para}>{currentUserDetails.email}</Text>
+
+
+
+
+
 
 
                     <TouchableOpacity
@@ -111,6 +133,16 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.77,
         shadowRadius: 5.677,
         elevation: 3,
+
+    },
+    avatar: {
+        height:200,
+        width:200,
+        backgroundColor: '#35354c',
+        borderRadius: 250,
+        margin: 7,
+        justifyContent: "center",
+        alignItems: 'center'
 
     },
     input: {

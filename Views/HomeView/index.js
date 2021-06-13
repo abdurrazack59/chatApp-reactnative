@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPaperPlane, faUserAlt, } from '@fortawesome/free-solid-svg-icons'
-import { saveUserMessage, getAllUsersData, getAllMsgs, db } from '../../Config/firebase'
+import { saveUserMessage, getAllUsersData, getAllMsgs } from '../../Config/firebase'
 import { auth } from '../../Config/firebase'
 
 export default function HomeView({ navigation }) {
@@ -22,14 +22,39 @@ export default function HomeView({ navigation }) {
 
     useEffect(() => {
         auth.onAuthStateChanged(user => { user ? setCurrentUserDetails(user) : setCurrentUserDetails(false) })
-
         getAllUsersData()
             .then(res => { setAllUsers(res) })
-            .catch(error => { console.log(`Error in getting all users data ==> ${error}`) })
+            .catch(error => {
+                Alert.alert(
+                    "ERROR",
+                    error.message,
+                    [
+                        {
+                            text: "Cancel",
+                            style: "cancel"
+                        },
+                        { text: "OK" }
+                    ],
+                    { cancelable: false }
+                );
+            })
 
         getAllMsgs()
             .then(res => { setAllUsersMsg(res) })
-            .catch(error => { console.log(`error in in getting all users msgs ==> ${error}`) })
+            .catch(error => {
+                Alert.alert(
+                    "ERROR",
+                    error.message,
+                    [
+                        {
+                            text: "Cancel",
+                            style: "cancel"
+                        },
+                        { text: "OK" }
+                    ],
+                    { cancelable: false }
+                );
+            })
 
 
     }, [forUpdating])
@@ -39,7 +64,6 @@ export default function HomeView({ navigation }) {
 
     // saving user message 
     const savingUserMessage = () => {
-        console.log(`user said : ${userInputMessage}`)
         saveUserMessage(userInputMessage, currentUserDetails.uid)
         setUserInputMessage('')
     }
@@ -49,7 +73,12 @@ export default function HomeView({ navigation }) {
             <View style={styles.header}>
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={styles.heading}>Chat With Friends </Text>
-                    <TouchableOpacity onPress={() => { navigation.navigate('profileview') }}>
+                    <TouchableOpacity onPress={() => {
+                        navigation.navigate('profileview',
+                            {
+                                userID: currentUserDetails.uid
+                            })
+                    }}>
                         <FontAwesomeIcon icon={faUserAlt} size={25} style={{ color: '#fff', margin: 10 }} />
                     </TouchableOpacity>
                 </View>
@@ -58,9 +87,16 @@ export default function HomeView({ navigation }) {
                     pagingEnabled={true}>
                     {allUsers.map((users) => {
                         return (
-                            <View style={styles.box}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.navigate('profileview',
+                                        {
+                                            userID: users.userID
+                                        })
+                                }}
+                                style={styles.box}>
                                 <Text style={styles.para}>{users.fullName.charAt(0)}</Text>
-                            </View>)
+                            </TouchableOpacity>)
                     })}
                 </ScrollView>
                 <Text style={styles.para}> . All Messages</Text>
@@ -68,8 +104,6 @@ export default function HomeView({ navigation }) {
             <ScrollView style={styles.scroll}>
                 <View style={styles.allMsgsContainer}>
                     {allUsersMsg.map(msgs => {
-                        console.log(`login user id ${currentUserDetails.uid}`)
-                        console.log(msgs)
                         if (currentUserDetails.uid === msgs.userID) {
                             return (
                                 <View style={styles.mineMsg}>

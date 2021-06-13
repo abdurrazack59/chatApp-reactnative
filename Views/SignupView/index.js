@@ -23,11 +23,6 @@ export default function SignupView({ navigation }) {
 
     // registering user 
     const signingUp = () => {
-        console.log(`
-        user email : ${userEmail}
-        user full name : ${userFullName}
-        user password : ${userPassword}
-        `)
         registerUser(userEmail, userPassword, userFullName)
     }
     
@@ -46,14 +41,14 @@ export default function SignupView({ navigation }) {
                 <TextInput style={styles.input} placeholder="Email" placeholderTextColor="gray" onChangeText={text => setUserEmail(text)} />
                 <TextInput style={styles.input} placeholder="Your Full Name" placeholderTextColor="gray" onChangeText={text => setUserFullName(text)} />
                 <TextInput style={styles.input} secureTextEntry={true} placeholder="Password" placeholderTextColor="gray" onChangeText={text => setUserPassword(text)} />
-                {isBtnLoad ? <Text style={{ color: '#35354c', fontSize: 20, textAlign: 'center' }}>Loading...</Text> : 
+                {isBtnLoad ? <Text style={{ color: '#35354c', fontSize: 20, fontFamily: 'Nunito', textAlign: 'center' }}>Loading...</Text> : 
                 <TouchableOpacity
                     style={styles.btn}
                     onPress={() => { signingUp() }}>
-                    <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>Sign up</Text>
+                    <Text style={{ color: '#fff', fontSize: 18, fontFamily: 'Nunito', textAlign: 'center' }}>Sign up</Text>
                 </TouchableOpacity>}
                 <TouchableOpacity style={{ marginTop: 20 }} onPress={() => { navigation.navigate('loginview') }} >
-                    <Text style={{ color: '#35354c', fontSize: 20, textAlign: 'center' }}>Log in</Text>
+                    <Text style={{ color: '#35354c', fontSize: 20, fontFamily: 'Nunito',textAlign: 'center' }}>Log in</Text>
                 </TouchableOpacity>
             </View>
             </ScrollView>

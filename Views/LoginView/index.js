@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView,Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import loginImage from '../../assets/login-img.png'
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
@@ -22,19 +22,11 @@ export default function LoginView({ navigation }) {
     // registering user 
     const signingIn = () => {
         setIsBtnLoad(true)
-        console.log(`
-        user email : ${userEmail}
-        user password : ${userPassword}
-        `)
         signInUser(userEmail, userPassword)
             .then((userCredential) => {
                 // Signed in
                 var user = userCredential.user;
-                console.log(`user login ${user}`)
-        setIsBtnLoad(false)
-               
-
-
+                setIsBtnLoad(false)
             })
             .catch((error) => {
                 var errorCode = error.code;
@@ -73,12 +65,12 @@ export default function LoginView({ navigation }) {
 
                     <TextInput style={styles.input} secureTextEntry={true} placeholder="Password" placeholderTextColor="gray" onChangeText={text => setUserPassword(text)} />
 
-                    {isBtnLoad ? <Text style={{ color: '#35354c', fontSize: 20, textAlign: 'center' }}>Loading...</Text> : 
-                    <TouchableOpacity style={styles.btn} onPress={() => { signingIn() }}>
-                    <Text style={{ color: '#fff', fontSize: 18, textAlign: 'center' }}>Log in</Text>
-                </TouchableOpacity>}
+                    {isBtnLoad ? <Text style={{ color: '#35354c', fontFamily: 'Nunito', fontSize: 20, textAlign: 'center' }}>Loading...</Text> :
+                        <TouchableOpacity style={styles.btn} onPress={() => { signingIn() }}>
+                            <Text style={{ color: '#fff',fontFamily: 'Nunito', fontSize: 18, textAlign: 'center' }}>Log in</Text>
+                        </TouchableOpacity>}
                     <TouchableOpacity style={{ marginTop: 20 }} onPress={() => { navigation.navigate('signupview') }} >
-                        <Text style={{ color: '#35354c', fontSize: 20, textAlign: 'center' }}>New User?</Text>
+                        <Text style={{ fontFamily: 'Nunito', color: '#35354c', fontSize: 20, textAlign: 'center' }}>New User?</Text>
                     </TouchableOpacity>
 
                 </View>

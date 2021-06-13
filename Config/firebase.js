@@ -19,8 +19,8 @@ const db = firebase.firestore()
 
 // function for registering user
 const registerUser = (email, password, fullName) => {
-  console.log(`firebase reg method run! 
-  provided email is ${email} password is ${password} full name is ${fullName}`)
+  console.log('firebase reg method run!')
+
   //calling firebase method for registering user
   auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
@@ -89,7 +89,7 @@ const signInUser = (email, password) => {
   console.log('Signin user')
   // calling firebase method for signing in user
   return firebase.auth().signInWithEmailAndPassword(email, password)
-    
+
 }
 
 // function for saving user's message
@@ -107,42 +107,61 @@ const saveUserMessage = (userMsg, userID) => {
 // function for signing out 
 const signOutUser = () => {
   // calling sign out firebase method 
-  return  auth.signOut()
-  
+  return auth.signOut()
+
 }
 
 // function for calling all users data 
-const getAllUsersData = () =>{
-  return new Promise((resolve,reject)=>{
+const getAllUsersData = () => {
+  return new Promise((resolve, reject) => {
     db.collection('allUsers').get()
-    .then(snapshot=>{
-      var arr = [];
-      snapshot.forEach(doc=>{
-      
-        arr.push({...doc.data()})
-        resolve(arr)
-       
+      .then(snapshot => {
+        var arr = [];
+        snapshot.forEach(doc => {
+
+          arr.push({ ...doc.data() })
+          resolve(arr)
+
+        })
       })
-    })
-    .catch(error=>{
-      reject(error)
-    })
+      .catch(error => {
+        reject(error)
+      })
   })
 }
 
+// function for calling  current user data
+const getCurrentUserData = (userID) => {
+  return new Promise((resolve, reject) => {
+    db.collection('allUsers').get()
+      .then(snapshot => {
+        var arr = [];
+        snapshot.forEach(doc => {
+         console.log(`all docs == ${doc}`)
+          arr.push({ ...doc.data() })
+          resolve(arr)
+
+        })
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
+}
 
 // function for calling all users message 
-const getAllMsgs = () =>{
-  return new Promise((resolve,reject)=>{
+const getAllMsgs = () => {
+  return new Promise((resolve, reject) => {
     db.collection("allUsersMessage").orderBy('timestamp', 'asc')
-    .onSnapshot((snapshot) => {
-      var arr = [];
-      snapshot.forEach(doc=>{
-        arr.push({...doc.data()})
-        resolve(arr)
-        
-      })
-    });
+      .onSnapshot((snapshot) => {
+        var arr = [];
+        snapshot.forEach(doc => {
+          
+          arr.push({ ...doc.data() })
+          resolve(arr)
+
+        })
+      });
   })
 }
 
@@ -154,5 +173,6 @@ export {
   signOutUser,
   getAllUsersData,
   getAllMsgs,
-  db
+  getCurrentUserData
+
 }
